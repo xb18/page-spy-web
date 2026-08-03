@@ -123,6 +123,10 @@ const sidebar = [
         },
         doc: 'harmony',
       },
+      {
+        label: 'Lynx',
+        doc: 'lynx',
+      },
     ],
   },
   {
