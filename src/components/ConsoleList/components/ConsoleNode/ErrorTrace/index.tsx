@@ -35,21 +35,30 @@ export const getStackFramesIfErrorTrace = (item: SpyConsole.DataItem) => {
 export const getStackFramesIfErrorConsole = (
   log: SpyConsole.DataItem['logs'][number],
 ) => {
-  if (log.type === 'error') {
-    const error = new Error();
-    error.stack = log.value;
-    const frames = ErrorStackParser.parse(error).filter(
-      ({ fileName, lineNumber, columnNumber }) => {
-        return [fileName, lineNumber, columnNumber].every(Boolean);
-      },
-    ) as RequiredFrames;
-    if (frames.length)
-      return {
-        error,
-        frames,
-      };
+  // parser may throw error if the error object's stack is invalid, e.g.
+  // ```
+  // const e = new Error()
+  // e.message = e.stack = '';
+  // console.error('Error', e);
+  // ```
+  try {
+    if (log.type === 'error' && log.value) {
+      const error = new Error();
+      error.stack = log.value;
+      const frames = ErrorStackParser.parse(error).filter(
+        ({ fileName, lineNumber, columnNumber }) => {
+          return [fileName, lineNumber, columnNumber].every(Boolean);
+        },
+      ) as RequiredFrames;
+      if (frames.length)
+        return {
+          error,
+          frames,
+        };
+    }
+  } catch {
+    return false;
   }
-  return false;
 };
 
 interface Props {
