@@ -46,7 +46,7 @@ const locateJsSource = (data: {
         line: lineNumber,
         column: columnNumber,
       });
-      if (!line || !column || !source) {
+      if (line == null || column == null || source == null) {
         return reject(new Error(getI18nText('failed-title')));
       }
 
